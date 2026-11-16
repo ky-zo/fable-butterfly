@@ -83,13 +83,13 @@ async function fly(seconds, dir = 1) {
   while (Date.now() - t0 < seconds * 1000) await scroll(dir * 1200);
 }
 
-// ---- the intro says one thing
+// ---- the intro says two things: how to fly, and how to move left and right
 await page.goto(`${URL0}/?fresh=1&scale=1`, { waitUntil: 'load' });
 await page.waitForFunction(() => window.__hl && window.__hl.ready, null, { timeout: 60000 });
 await page.evaluate(() => window.__hl.ready);
 await wait(1500);
 const how = await page.evaluate(() => [...document.querySelectorAll('.hl-intro-how li')].map((li) => li.textContent.trim()));
-check('the intro gives one instruction', how.length === 1 && /fly/.test(how[0]), how.join(' | '));
+check('the intro says how to fly and how to move left and right', how.length === 2 && /fly/.test(how[0]) && /left or right/.test(how[1]), how.join(' | '));
 await page.screenshot({ path: resolve(out, '0-intro.png') });
 
 // ---- the journey
@@ -250,9 +250,9 @@ if (hasFinds) {
     while (s.p < list[i].from - 0.03 && Date.now() - t0 < 60000) {
       await scroll(300);
       s = await info();
-      if (/steer/.test(s.coach)) hinted = s.coach;
+      if (/left or right/.test(s.coach)) hinted = s.coach;
     }
-    if (i === 0) check('how to steer is said once, before the first find', /steer/.test(hinted) && s.cells[0] === '0', hinted);
+    if (i === 0) check('how to steer is said once, before the first find', /left or right/.test(hinted) && s.cells[0] === '0', hinted);
     // …then go on slowly and steer the butterfly onto it
     const t1 = Date.now();
     let lit = false;
@@ -300,7 +300,7 @@ if (hasFinds) {
     }
   }
   s = await info();
-  check('the instruction to steer is gone once they have', !/steer/.test(s.coach), s.coach);
+  check('the instruction to steer is gone once they have', !/left or right/.test(s.coach), s.coach);
 }
 appErrors += await page.evaluate(() => (window.__hl.errors || []).length);
 check('no page errors', errors.length === 0 && appErrors === 0, errors.concat(appErrors ? [`${appErrors} app errors`] : []).join('; '));

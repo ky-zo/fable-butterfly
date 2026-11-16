@@ -268,3 +268,30 @@ two last things:
 ```text
 push
 ```
+
+### 41 · 2026-11-16 10:18:06 UTC
+
+````text
+is this correct?
+
+```
+I tried to test Fable 5.2's ability to build aesthetic 3d scenes without any 3d tools.
+
+the result just dropped my jaw. this is fully ThreeJS.
+
+Play it here: 
+butterfly.kyzo.io
+
+github + prompts below, bookmark it ⬇️
+```
+
+also, what is the total "cost" of used tokens in this conversation?
+````
+
+### 42 · 2026-11-16 10:39:33 UTC
+
+```text
+add an info in the beginning "scroll to fly", use mouse to move left/right.
+
+commit and push to prod don't ask and wait for me.
+```

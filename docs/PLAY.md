@@ -644,3 +644,9 @@ for a world that has finds; worlds without `meta.play.finds` (02 to 06) still li
 - **No leaf wraps a corner.** The leaf shader lays whatever pokes into the corridor flat on the nearest pane, vertex by
   vertex, so a leaf reaching in at a corner was pulled into straight green lines from one pane to the other. Such
   leaves (about twenty) are no longer planted (`wrapsCorner` in `garden.js`); leaves composed onto a pane by hand stay.
+
+## 17. Both controls on the intro card
+
+The intro card now says two things instead of one: "Scroll to fly" and "Use the mouse to move left or right" (on touch:
+"Swipe up to fly" and "Drag sideways to move left or right"). The in-flight steering hint uses the same words
+(`COACH.side` in `src/ui/hud.js`), so the control is met twice with the same face. `tools/scroll.mjs` checks both lines.

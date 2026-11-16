@@ -43,7 +43,8 @@ const COACH = {
   scroll: [COARSE ? ICON_SWIPE : ICON_WHEEL, 'Swipe up to fly', 'Scroll to fly'],
   hold: [ICON_HOLD, 'Hold to fly', 'Hold to fly'],
   steer: [ICON_STEER, 'Drag to steer', 'Move to steer'],
-  side: [ICON_STEER, 'Drag sideways to steer', 'Move to steer'], // scroll: up and down is the journey
+  // scroll: up and down is the journey, so the other thing to know is left and right (on the intro card and in flight)
+  side: [ICON_STEER, 'Drag sideways to move left or right', 'Use the mouse to move left or right'],
   faster: [ICON_FASTER, 'Swipe up to go faster', 'Press S to go faster'],
 };
 const SPEED_FLASH = 1.3; // seconds the new speed is written large after a change
@@ -260,7 +261,7 @@ export class Hud {
 
     // ---- intro
     const c = this.coarse ? 1 : 2;
-    const how = (this.scroll ? ['scroll'] : ['hold', 'steer', 'faster']).map((k) => `<li>${COACH[k][0]}<span>${COACH[k][c]}</span></li>`);
+    const how = (this.scroll ? ['scroll', 'side'] : ['hold', 'steer', 'faster']).map((k) => `<li>${COACH[k][0]}<span>${COACH[k][c]}</span></li>`);
     this.introEl = h('section', 'hl-intro');
     this.introEl.dataset.ui = '';
     this.introEl.setAttribute('aria-labelledby', 'hl-intro-title');
