@@ -1,0 +1,23 @@
+{
+  "name": "hidden-layers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Six small worlds and one butterfly: a glasswing that cannot get out of a glasshouse. Scroll to fly.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5198",
+    "shot": "node tools/shot.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.0.0",
+    "@fontsource-variable/geist-mono": "^5.0.0",
+    "@fontsource-variable/newsreader": "^5.0.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.0",
+    "vite": "^8.3.8"
+  }
+}
