@@ -635,3 +635,12 @@ for a world that has finds; worlds without `meta.play.finds` (02 to 06) still li
 - **Not done.** No find lines are said on scroll, nothing in worlds 02 to 06, no keyboard steering in scroll mode
   (the arrows step the journey). With a mouse the cursor is absolute, so anybody who moves it near the animal in the
   first two windows makes those finds with little effort, as in play (section 5). Not tried on a real phone.
+
+## 16. The hand on the glass, and the corners (2026-11-16)
+
+- **Wiping the fog is back.** In world 01, where the cursor moves (or a finger drags) across a pane the fog is wiped
+  and grows back on its own (`Conservatory._wipe` → `Condensation.wipe`). Only a moving hand wipes: a cursor at rest
+  while the journey scrolls leaves no line. Not in `?play`, where the pointer is the aim.
+- **No leaf wraps a corner.** The leaf shader lays whatever pokes into the corridor flat on the nearest pane, vertex by
+  vertex, so a leaf reaching in at a corner was pulled into straight green lines from one pane to the other. Such
+  leaves (about twenty) are no longer planted (`wrapsCorner` in `garden.js`); leaves composed onto a pane by hand stay.

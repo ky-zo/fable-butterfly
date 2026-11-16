@@ -32,6 +32,46 @@ function outside(p) {
   return m;
 }
 
+/**
+ * Would this leaf be pressed against two faces of the glasshouse at once? The leaf shader lays whatever pokes into the
+ * corridor flat on the nearest pane, vertex by vertex. A leaf that reaches in at a corner has some of its vertices
+ * laid on one pane and the rest on the other, and the triangles between them are pulled into straight green lines
+ * from pane to pane across the corner. (Same five planes and the same test as leafShader.js.)
+ */
+function wrapsCorner(m, geo) {
+  const e = m.elements;
+  const bs = geo.boundingSphere;
+  const r = bs.radius * Math.max(Math.hypot(e[0], e[1], e[2]), Math.hypot(e[4], e[5], e[6]), Math.hypot(e[8], e[9], e[10]));
+  const cx = e[0] * bs.center.x + e[4] * bs.center.y + e[8] * bs.center.z + e[12];
+  const cy = e[1] * bs.center.x + e[5] * bs.center.y + e[9] * bs.center.z + e[13];
+  const cz = e[2] * bs.center.x + e[6] * bs.center.y + e[10] * bs.center.z + e[14];
+  // (most of the garden is nowhere near the glass: it has to come within reach of two faces to be looked at)
+  let reach = 0;
+  for (let i = 0; i < 5; i++) if (HULL[i][0] * cx + HULL[i][1] * cy + HULL[i][2] * cz - HULL[i][3] < r) reach++;
+  if (reach < 5) return false; // some face has all of it outside
+  const pos = geo.attributes.position;
+  let first = -1;
+  let two = false;
+  let deep = 0;
+  for (let v = 0; v < pos.count; v++) {
+    const x = pos.getX(v), y = pos.getY(v), z = pos.getZ(v);
+    const X = e[0] * x + e[4] * y + e[8] * z + e[12];
+    const Y = e[1] * x + e[5] * y + e[9] * z + e[13];
+    const Z = e[2] * x + e[6] * y + e[10] * z + e[14];
+    let mx = -1e9;
+    let f = -1;
+    for (let i = 0; i < 5; i++) {
+      const sd = HULL[i][0] * X + HULL[i][1] * Y + HULL[i][2] * Z - HULL[i][3];
+      if (sd > mx) { mx = sd; f = i; }
+    }
+    if (mx >= 0.004) continue; // outside the glass: not pressed
+    if (first < 0) first = f;
+    else if (f !== first) two = true;
+    if (-mx > deep) deep = -mx;
+  }
+  return two && deep > 0.02;
+}
+
 class Batch {
   constructor() {
     this.items = [];
@@ -377,12 +417,16 @@ export class Garden {
     for (const key of keys) {
       if (++built % 10 === 0) await ctx.yield();
       const [name, group] = key.split('|');
-      const items = this.batches.get(key).items;
+      const src = geos[name];
+      if (!src.boundingSphere) src.computeBoundingSphere();
+      const lodSrc = LOD[name] ? geos[LOD[name][0]] : null;
+      if (lodSrc && !lodSrc.boundingSphere) lodSrc.computeBoundingSphere();
+      // (a leaf composed onto a pane by hand, seed.w >= 2, is squeezed flat by the shader and stays as it was laid)
+      const items = this.batches.get(key).items.filter((it) => it.seed[3] >= 1.5 || !(wrapsCorner(it.m, src) || (lodSrc && wrapsCorner(it.m, lodSrc))));
       if (!items.length) continue;
       used.add(name);
       items.sort((a, b) => a.key - b.key); // nearest the glass first → early-z does the rest
       // instanced attributes live on the geometry, so every group needs its own (index/vertex buffers are shared)
-      const src = geos[name];
       const geo = ctx.track(new THREE.BufferGeometry());
       for (const a of Object.keys(src.attributes)) geo.setAttribute(a, src.attributes[a]);
       geo.setIndex(src.index);

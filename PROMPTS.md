@@ -251,3 +251,20 @@ git@github.com:ky-zo/fable-butterfly.git
 
 another sub-agent to put into github all the prompts I've sent to u as well.
 ```
+
+### 39 · 2026-11-16 04:39:12 UTC
+
+```text
+two last things:
+
+1) in the past we had this thing that when moving the cursor, the fog was being wiped from the glass. bring this back
+2) the leafs at the end of the glasshouse are kinda broken they're like a line crossing the corner of the glasshouse. can u fix that?
+
+[image attached]
+```
+
+### 40 · 2026-11-16 09:27:09 UTC
+
+```text
+push
+```

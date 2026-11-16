@@ -254,6 +254,7 @@ export default class Conservatory {
     this._v = new THREE.Vector3();
     this._st = new THREE.Vector2();
     this._hit = { wall: 0, s: 0, t: 0, dist: 0 };
+    this._hand = { wall: -1, s: 0, t: 0 }; // where the visitor's cursor last touched the glass (see _wipe)
     this.focus = 4;
     this.gardenScale = 1;
     this.lodScale = this.garden.lodScale;
@@ -311,6 +312,30 @@ export default class Conservatory {
     }
     r.setRenderTarget(null);
     await r.compileAsync(this.hero.scene, this.camera);
+  }
+
+  /**
+   * The visitor's hand on the glass: where the cursor moves (or a finger drags), the fog is wiped away, and it grows
+   * back on its own. Only a hand that is moving wipes: a cursor at rest while the journey scrolls past leaves no line.
+   * (Not in ?play, where the pointer is the aim and a hold means fly.)
+   */
+  _wipe(frame) {
+    const ptr = frame.pointer;
+    const last = this._hand;
+    const hit = ptr.inside && ptr.idle < 0.15 ? this.castNDC(ptr.x, ptr.y) : null;
+    if (!hit) {
+      last.wall = -1;
+      return;
+    }
+    if (last.wall === hit.wall) {
+      const d = Math.hypot(hit.s - last.s, hit.t - last.t);
+      if (d < 0.004) return; // (not far enough yet to be a stroke)
+      // a fingertip: about the same size on screen wherever the glass is, within reason
+      if (d < 0.7) this.cond.wipe(hit.wall, last.s, last.t, hit.s, hit.t, Math.min(0.07, Math.max(0.016, hit.dist * 0.032)), 0.85);
+    }
+    last.wall = hit.wall;
+    last.s = hit.s;
+    last.t = hit.t;
   }
 
   /** Cast a ray from NDC onto the simulated glass. Returns { wall, s, t, dist } (reused object) or null. */
@@ -597,6 +622,7 @@ export default class Conservatory {
     this.anchor.y = Math.max(-0.9, Math.min(0.9, this._v.y));
     if (play && play.mode === 'scroll') this._scroll(frame, play);
     else this.steerHint = false;
+    if (!on) this._wipe(frame);
 
     // down on the pane: the four feet are set on the fog, and for as long as it stays the patch it cleared coming in
     // stays clear (a function of progress: leave, and it fogs over)
